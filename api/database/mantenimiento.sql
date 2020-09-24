@@ -171,3 +171,9 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2020-09-24  9:08:20
+
+ALTER TABLE `mantenimiento`.`users` 
+DROP COLUMN `remember_token`,
+DROP COLUMN `email_verified_at`,
+CHANGE COLUMN `nombre` `nombre` VARCHAR(100) NOT NULL ,
+CHANGE COLUMN `usuaro` `usuario` VARCHAR(25) NOT NULL ;
