@@ -29,7 +29,7 @@ export default{
 	actions:{
 	
 		Authologin({commit},usuario){
-			return new Promise((resolve, reject) => {
+			return new Promise((resolve) => {
 				commit('AUTHENTICAR', false)
 				commit('LOGEADO', true);
 				commit('DATOS_USUARIO', usuario );
@@ -38,13 +38,12 @@ export default{
 		},
     Login({commit}, payload){
 			return new Promise((resolve, reject) => {
-			  Vue.http.post('login.permisos', payload).then(response =>{
+			  Vue.http.post('login', payload).then(response =>{
 					if(response.body.length){
 						resolve(true)
 						commit('AUTHENTICAR', false)
 						commit('LOGEADO', true);
 						commit('DATOS_USUARIO', response.body[0]);
-						console.log('response', response.body[0]);
 					}else{
 						resolve(false)
 						commit('AUTHENTICAR', true)
@@ -59,7 +58,6 @@ export default{
 			commit('AUTHENTICAR', estatus)
 		},
 		salirLogin({commit}){
-			// this.$store.dispatch("salir")
 			commit('AUTHENTICAR', true)
 			commit('SALIR')
 		},

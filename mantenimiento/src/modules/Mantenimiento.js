@@ -5,19 +5,24 @@ export default{
 	state:{
     mantenimiento: [],
 		loading: true,
+		fechas: {}
 	},
 
 	mutations:{
 		MANTENIMIENTO(state, data){
-			state.llamadas = data
+			state.mantenimiento = data
     },
     LOADING(state, data){
 			state.loading = data; 
 		},
+		FECHAS(state, fechas){
+			state.fechas = fechas
+		}
 	},
 	actions:{
 		consultaMantenimiento({commit}, payload){
 			// Limpio Arreglo y Genero Consulta
+			commit('FECHAS', payload);
 			commit('MANTENIMIENTO', []); commit('LOADING',true);
 			Vue.http.post('mantenimientos', payload).then(response=>{
 				commit('MANTENIMIENTO', response.body)
@@ -36,6 +41,10 @@ export default{
     Loading(state){
 			return state.loading
 		},
+		
+		fechas(state){
+			return state.fechas
+		}
 
 	}
 }

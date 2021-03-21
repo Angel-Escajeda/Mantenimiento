@@ -72,15 +72,12 @@
 						@page-count="pageCount = $event"
 						dense
 			    >
-
-			    	<!-- <template v-slot:item.action="{ item }" > 
-			    		<v-btn  class="celeste" icon dark @click="abrirModal(2, item)"><v-icon> create </v-icon></v-btn> 
-				    </template> -->
-
 						<template v-slot:item.fecha="{item}">
 							<span> {{  moment(item.fecha).format('LL') }} </span>
 						</template>
-
+						<template v-slot:item.action="{ item }" v-if="getdatosUsuario.id === 2"> 
+			    		<v-btn  class="celeste" icon dark @click="abrirModal(2, item)"><v-icon> create </v-icon></v-btn> 
+				    </template>
 			    </v-data-table>
 			  </v-card>
 				<!-- PAGINACION -->
@@ -88,6 +85,11 @@
 					<v-pagination v-model="page" :length="pageCount"></v-pagination>
 				</div>
 
+				<v-dialog persistent v-model="dialog" width=600 >	
+		    	<v-card class="pa-3">
+		    		<controlMantenimiento :modoVista="modoVista" :parametros="parametros" @modal="dialog = $event" />
+		    	</v-card>
+		    </v-dialog>
        
 				 
   		</v-col>
@@ -96,6 +98,7 @@
 </template>
 
 <script>
+	import controlMantenimiento  from '@/views/controlMantenimiento.vue';
 	import {mapGetters, mapActions} from 'vuex';
 	import  ExcelExport from '@/mixins/ExcelExport.js';
 	import moment from 'moment'
@@ -104,7 +107,7 @@
 	export default {
 		mixins:[ExcelExport],
 		components: {
-			// controlLlamadas
+			controlMantenimiento
 		},
 		data () {
 				return {
@@ -114,26 +117,25 @@
 					pageCount: 0,
 					itemsPerPage: 100,
 					search: '',
-					// dialog: false,
-					// modoVista: 0,
-					// parametros:'',
+					dialog: false,
+					modoVista: 0,
+					parametros:'',
 					headers:[
-            { text: 'Fecha'                  , align: 'left'  , value: 'fecha'	 },
+            { text: 'Fecha'                  , align: 'left'  , value: 'fecha_actual'	 },
 						{ text: 'Tipo de mantenimiento'  , align: 'left'  , value: 'nomtipo'  },
 						{ text: 'Hora inicio'    				 , align: 'left'  , value: 'hora1'   },
 						{ text: 'Hora final'     		 	   , align: 'left'  , value: 'hora2' },
-						{ text: 'Departamento' 	    		 , align: 'left'  , value: 'depto'   },
+						{ text: 'Departamento' 	    		 , align: 'left'  , value: 'nomdepto'   },
 						{ text: 'Maquina' 	             , align: 'left'  , value: 'nommaquina'    },
             { text: 'Causas' 	               , align: 'left'  , value: 'causas'     },
 						{ text: 'Contramedidas' 	       , align: 'left'  , value: 'contramedidas'     },
-						// { text: ''  			    			     , align: 'right' , value: 'action', sortable: false },
+						{ text: ''  			    			     , align: 'right' , value: 'action', sortable: false },
 
 					],
 					date: new Date().toISOString().substr(0, 10),
 					menu: false,
 					date2: new Date().toISOString().substr(0, 10),
           menu2: false,
-          
          
 				}
 			},
@@ -169,7 +171,6 @@
 			watch:{
 				date(){ this.init() },
 				date2(){ this.init() },
-				// recarga(){ this.init() },
 			},
 
 			methods:{
@@ -187,15 +188,16 @@
 						tHeaders.push(this.headers[j].text);
 						tValores.push(this.headers[j].value);
 					}
-					let tInformacion = this.getLlamadas
+					let tInformacion = this.getMantenimiento
+
 					this.manejarDescarga(this.titulo,tHeaders,tValores,tInformacion)
 				},
 
-				// abrirModal(action, items){
-				// 	this.modoVista = action;
-				// 	this.parametros = items;
-				// 	this.dialog = true;
-				// },
+				abrirModal(action, items){
+					this.modoVista = action;
+					this.parametros = items;
+					this.dialog = true;
+				},
 			
 			}
 	}

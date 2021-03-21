@@ -6,9 +6,13 @@
       </template>
     </v-snackbar>
 
-    <v-col cols="12" sm="12">
+    <v-col cols="12" sm="11">
       <v-row justify="center">
-        <v-col cols="12" sm="11" md="8" lg="6" xl="4" >
+        <v-col cols="12" class="text-right ma-0 pa-0 "><v-btn text color="red" @click="$emit('modal',false)">
+          <v-icon>mdi-close </v-icon></v-btn>
+        </v-col>
+
+        <v-col cols="12"  >
           <v-col cols="12" class="text-right "> IT-7-PRO-01-RO2</v-col>
           <v-col cols="12" align="center">
            <div class="text-lg-h5 text-md-h6 text-sm-h4 text-body-1 font-weight-black">REPORTEDE MANTENIMIENTO</div>
@@ -103,7 +107,7 @@
             </v-row>
           </v-form>
           <v-card-actions>
-            <v-spacer></v-spacer><v-btn color="success" :disabled="!valid" @click="agregaMantenimiento">Guardar Información</v-btn>
+            <v-spacer></v-spacer><v-btn color="success" :disabled="!valid" @click="actualizaMantenimiento">Actualizar Información</v-btn>
           </v-card-actions>
           <v-col cols="12" class="caption" >Revisión N°1 <br> Vigente a partir del 20 de enero del 2020 </v-col>
 
@@ -133,9 +137,14 @@
 
 <script>
   import SelectMixin from '@/mixins/SelectMixin.js' 
+	import {mapGetters, mapActions} from 'vuex';
+
   export default {
     mixins:[SelectMixin],
-
+    props:[
+			'modoVista',
+			'parametros',
+	  ],
     data:()=>({
       valid: true,
       fecha      : '',
@@ -172,21 +181,37 @@
     }),
 
     created(){
-     this.fecha = this.traerFechaActual();
-     this.hora  = this.traerHoraActual();
-     this.hora2 = this.traerHoraActual();
      this.consultaDeptos();
      this.consultaTipos();
+     this.asignaValores();
     },
 
     watch:{
 			depto: function(){
 				this.consultaMaquinasxDeptos(this.depto.id)
-			}
+      },
+      parametros: function(){ this.asignaValores(); }
     },
+
+    computed:{
+			// IMPORTANDO USO DE VUEX - CLIENTES (GETTERS)
+			...mapGetters('Mantenimiento'  ,['fechas']),
+		},
     
     methods:{
-      agregaMantenimiento(){
+				...mapActions('Mantenimiento'  ,['consultaMantenimiento']), // IMPORTANDO USO DE VUEX (ACCIONES)
+
+      asignaValores(){
+        this.fecha = this.parametros.fecha_actual,
+        this.tipo  = { id: this.parametros.tipo, nombre: this.parametros.nomtipo };
+        this.hora  = this.parametros.hora1;
+        this.hora2 = this.parametros.hora2;
+        this.depto = { id: this.parametros.id_depto, nombre: this.parametros.nomdepto};
+        this.maquina = { id: this.parametros.id_maquina, nombre: this.parametros.nommaquina};
+        this.causas = this.parametros.causas;
+        this.contramedida = this.parametros.contramedidas;
+      },
+      actualizaMantenimiento(){
         this.dialog = true; 
         const payload = { fecha_actual: this.fecha,
                           tipo : this.tipo.id,
@@ -197,11 +222,18 @@
                           causas: this.causas,
                           contramedidas: this.contramedida
                         }
-        this.$http.post('mantenimiento', payload).then(response =>{
+        this.$http.put('mantenimiento/'+ this.parametros.id, payload).then(response =>{
           this.snackbar = true; this.text = response.bodyText; this.color="green"
         }).catch(error =>{
-          this.snackbar=true; this.text=error.bodyText; this.color="error"
-        }).finally(()=> { this.dialog = false; this.limpiarCampos() })
+          this.snackbar=true; this.text=error.bodyText; this.color="orange"
+        }).finally(()=> { 
+          var me = this
+          this.dialog = false; 
+          this.limpiarCampos();
+          setTimeout(function(){ me.$emit('modal',false)}, 2000);
+          this.limpiarCampos();  //LIMPIAR FORMULARIO
+          this.consultaMantenimiento(this.fechas) //ACTUALIZAR CONSULTA DE USUARIOS 
+        })
       },
 
 

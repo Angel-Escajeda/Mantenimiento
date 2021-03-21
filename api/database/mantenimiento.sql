@@ -177,3 +177,22 @@ DROP COLUMN `remember_token`,
 DROP COLUMN `email_verified_at`,
 CHANGE COLUMN `nombre` `nombre` VARCHAR(100) NOT NULL ,
 CHANGE COLUMN `usuaro` `usuario` VARCHAR(25) NOT NULL ;
+
+ALTER TABLE `mantenimiento`.`mantenimientos` 
+ADD COLUMN `id_depto` INT NULL AFTER `hora2`;
+
+CREATE TABLE `mantenimiento`.`maquinas` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(45) NULL,
+  `id_depto` VARCHAR(45) NULL,
+  `estatus` INT NULL DEFAULT 1,
+  PRIMARY KEY (`id`));
+
+  ALTER TABLE `mantenimiento`.`mantenimientos` 
+CHANGE COLUMN `fecha_actual` `fecha_actual` DATE NULL ,
+CHANGE COLUMN `tipo` `tipo` INT(11) NULL ,
+CHANGE COLUMN `hora1` `hora1` DATETIME NULL ,
+CHANGE COLUMN `hora2` `hora2` DATETIME NULL ,
+CHANGE COLUMN `id_maquina` `id_maquina` INT(11) NULL ,
+CHANGE COLUMN `causas` `causas` VARCHAR(255) NULL ,
+CHANGE COLUMN `contramedidas` `contramedidas` VARCHAR(255) NULL ;

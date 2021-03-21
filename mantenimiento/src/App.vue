@@ -48,8 +48,15 @@
     <v-app-bar app color="celeste" dark height="70px">
       <img src="http://producciongama.com:8080/IMAGENES/logotipo.png" width="50px" @click.stop="drawer = !drawer" >
       <v-spacer></v-spacer>
+      <!-- <v-toolbar-items text-right>
+         <v-btn text small > 
+          <a :href="apk_movil" style="text-decoration: none; color:white">
+            <v-icon>mdi-cellphone-iphone</v-icon>
+          </a>
+        </v-btn>
+      </v-toolbar-items> -->
       <v-toolbar-items text-right>
-       <!-- <v-btn small dark @click="cerrar_sesion=true" v-if="getLogeado">  <v-icon right>mdi-exit-to-app</v-icon></v-btn> -->
+       <v-btn text small @click="cerrar_sesion=true" v-if="getLogeado">  <v-icon >mdi-exit-to-app</v-icon></v-btn>
       </v-toolbar-items>
     </v-app-bar>
     <!-- LOGIN -->
@@ -118,6 +125,7 @@
 
     },
     data: () => ({
+      apk_movil:'http://producciongama.com:8080/MANTENIMIENTO/mantenimiento.apk',
       iniciar: false,
       cerrar_sesion:false,
       valid:true,
@@ -161,7 +169,13 @@
     created(){ 
       if (typeof(Storage) !== "undefined") {
         var usuario = '';
-        if( usuario = JSON.parse(localStorage.getItem("usuario")) === null){ return } // VERIFICO SI EXISTE UN USUARIO ACTIVO 
+        // VERIFICO SI EXISTE UN USUARIO ACTIVO 
+        if( usuario = JSON.parse(localStorage.getItem("usuario")) != null){ 
+          usuario = JSON.parse(localStorage.getItem("usuario")) 
+        }else{ 
+          return 
+        }
+
         if(usuario.id ){ 
           this.Authologin(usuario).then(response =>{
             this.saludar()
@@ -178,7 +192,7 @@
 
       IniciarSesion (){
         this.iniciar = true; var md5 = require('md5')
-        var usuario = { correo: this.correo,usuario : this.correo.toUpperCase(), contrasenia: md5(this.contrasenia)};
+        var usuario = { usuario : this.correo.toUpperCase(), contrasenia: md5(this.contrasenia)};
         this.Login(usuario).then(response => {
           if(response){
             this.$router.push({name:'inicio'})
@@ -199,11 +213,10 @@
       },
 
       salir(){
+        localStorage.removeItem("usuario");
         this.cerrar_sesion= false;
         this.salirLogin()
         this.$store.dispatch("salir")
-        localStorage.removeItem("usuario");
-        
       },
 
       limpiarCampos(){
